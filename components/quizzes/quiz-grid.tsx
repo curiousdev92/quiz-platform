@@ -44,7 +44,7 @@ export async function QuizGrid({ filters }: { filters: Filters }) {
     values.push(`%${filters.search}%`)
   }
 
-  const quizzes = await sql(
+  const quizzes = await sql.query(
     `
     SELECT q.*, u.name as author_name,
       (SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count,
