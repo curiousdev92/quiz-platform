@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useActionState } from "react"
 import Link from "next/link"
 import { updateQuiz, deleteQuiz, togglePublish } from "@/app/actions/quiz"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Trash2, Eye, EyeOff, Star, MessageSquare } from "lucide-react"
+import { ArrowLeft, Trash2, Eye, EyeOff, Star, MessageSquare, AlertCircle, CheckCircle } from "lucide-react"
 import { QuestionList } from "./question-list"
 import { QuestionForm } from "./question-form"
 import type { Quiz, Question, Rating, Comment } from "@/lib/db"
@@ -35,6 +36,9 @@ export function QuizEditor({
 }) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isToggling, setIsToggling] = useState(false)
+
+  const boundUpdateQuiz = updateQuiz.bind(null, quiz.id)
+  const [updateState, updateFormAction, isUpdating] = useActionState(boundUpdateQuiz, null)
 
   const avgRating = ratings.length > 0 ? ratings.reduce((sum, r) => sum + r.value, 0) / ratings.length : 0
 
@@ -97,7 +101,20 @@ export function QuizEditor({
               <CardDescription>Update your quiz information</CardDescription>
             </CardHeader>
             <CardContent>
-              <form action={(formData) => updateQuiz(quiz.id, formData)} className="space-y-6">
+              <form action={updateFormAction} className="space-y-6">
+                {updateState?.error && (
+                  <div className="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+                    <AlertCircle className="h-4 w-4" />
+                    {updateState.error}
+                  </div>
+                )}
+                {updateState?.success && (
+                  <div className="flex items-center gap-2 p-3 text-sm text-green-600 bg-green-50 rounded-md">
+                    <CheckCircle className="h-4 w-4" />
+                    Quiz updated successfully
+                  </div>
+                )}
+
                 <input type="hidden" name="isPublished" value={quiz.is_published.toString()} />
 
                 <div className="space-y-2">
@@ -145,7 +162,9 @@ export function QuizEditor({
                   <Input id="tags" name="tags" defaultValue={quiz.tags?.join(", ") || ""} />
                 </div>
 
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit" disabled={isUpdating}>
+                  {isUpdating ? "Saving..." : "Save Changes"}
+                </Button>
               </form>
             </CardContent>
           </Card>

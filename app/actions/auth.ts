@@ -6,7 +6,7 @@ import { hashPassword, verifyPassword, createSession, deleteSession } from "@/li
 
 const sql = neon(process.env.DATABASE_URL!)
 
-export async function register(formData: FormData) {
+export async function register(prevState: any, formData: FormData) {
   const name = formData.get("name") as string
   const email = formData.get("email") as string
   const password = formData.get("password") as string
@@ -56,7 +56,7 @@ export async function register(formData: FormData) {
   }
 }
 
-export async function login(formData: FormData) {
+export async function login(prevState: any, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
 

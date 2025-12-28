@@ -5,7 +5,8 @@ import { redirect } from "next/navigation"
 import { sql } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
 
-export async function createQuiz(formData: FormData) {
+// <CHANGE> Added prevState parameter for useActionState compatibility
+export async function createQuiz(prevState: any, formData: FormData) {
   const user = await requireRole(["teacher", "admin"])
 
   const title = formData.get("title") as string
@@ -33,7 +34,8 @@ export async function createQuiz(formData: FormData) {
   redirect(`/teacher/quizzes/${result[0].id}`)
 }
 
-export async function updateQuiz(quizId: string, formData: FormData) {
+// <CHANGE> Added prevState parameter for useActionState compatibility
+export async function updateQuiz(quizId: string, prevState: any, formData: FormData) {
   const user = await requireRole(["teacher", "admin"])
 
   // Verify ownership
@@ -109,7 +111,8 @@ export async function togglePublish(quizId: string) {
   return { success: true }
 }
 
-export async function addQuestion(quizId: string, formData: FormData) {
+// <CHANGE> Added prevState parameter for useActionState compatibility after bind
+export async function addQuestion(quizId: string, prevState: any, formData: FormData) {
   const user = await requireRole(["teacher", "admin"])
 
   const quiz = await sql`SELECT author_id FROM quizzes WHERE id = ${quizId}`
